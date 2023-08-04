@@ -12,11 +12,13 @@ const MODEL_URL = <const>{
   SKELETON: `${import.meta.env.VITE_API_DOMAIN}/models/turbine.glb`,
   PLANE: `${import.meta.env.VITE_API_DOMAIN}/models/plane.glb`,
   EQUIPMENT: `${import.meta.env.VITE_API_DOMAIN}/models/equipment.glb`,
+  LEGO: `${import.meta.env.VITE_API_DOMAIN}/models/lowpoly.glb`,
 }
 
 export function useTurbine() {
   const loading = ref(false)
   const turbine = new THREE.Group()
+  const modelLego = shallowRef<THREE.Object3D>()
   const modelSkeleton = shallowRef<THREE.Object3D>()
   const modelPlane = shallowRef<THREE.Object3D>()
   const modelEquipment = shallowRef<THREE.Object3D>()
@@ -47,6 +49,17 @@ export function useTurbine() {
       directionalLight.position.set(x, y, z)
       scene.value?.add(directionalLight)
     })
+  }
+  const loadTurbineLego = async () => {
+    const { scene: object, animations } = await loadGLTF(MODEL_URL.LEGO)
+    object.scale.set(1, 1, 1)
+    object.position.set(1, 2, -1)
+    console.log(object, animations , '动画');
+    
+    loadAnimate(object, animations, animations[0].name)
+    object.name = 'lego'
+    modelLego.value = object
+    turbine.add(object)
   }
   // 加载风机骨架
   const loadTurbineSkeleton = async () => {
@@ -226,7 +239,7 @@ export function useTurbine() {
   }
   onMounted(async () => {
     loading.value = true
-    console.log(geometry,'geometry')
+    console.log(geometry,'geometry', turbine)
     // scene.value?.add(geometry)
     scene.value?.add(turbine)
     camera.value?.position.set(-1, 3.5, 2)
@@ -234,6 +247,7 @@ export function useTurbine() {
     control.value?.update()
     loadLights()
     await loadModels([
+      loadTurbineLego(),
       loadTurbineSkeleton(),
       loadTurbinePlane(),
       loadTurbineEquipments(),
