@@ -52,7 +52,7 @@ export function useTurbine() {
   }
   const loadTurbineLego = async () => {
     const { scene: object, animations } = await loadGLTF(MODEL_URL.LEGO)
-    object.scale.set(1, 1, 1)
+    object.scale.set(0.5, 0.5, 0.5)
     object.position.set(1, 2, -1)
     console.log(object, animations , '动画');
     
